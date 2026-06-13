@@ -1,5 +1,24 @@
 "use server";
  
+// Simulasi Server Action untuk pengujian UI (Mockup)
+export async function verifyVoterPin(pin: string) {
+  // Simulasi jeda jaringan selama 1.5 detik
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+ 
+  // Simulasi logika database: Anggap "123456" adalah PIN yang benar
+  if (pin === "123456") {
+    return { success: true };
+  }
+ 
+  // Jika PIN selain 123456, kembalikan pesan error
+  return {
+    success: false,
+    error: "PIN tidak terdaftar atau sudah digunakan. Silakan cek kembali.",
+  };
+}
+
+
+ 
 import { createClient } from "@/utils/supabase/server";
  
 export async function loginAdmin(formData: FormData) {
@@ -20,12 +39,14 @@ export async function loginAdmin(formData: FormData) {
         password,
       });
  
-    if (authError) {
-      return {
-        success: false,
-        error: "Kredensial salah atau akun tidak ditemukan.",
-      };
-    }
+   if (authError) {
+  console.log(authError);
+
+  return {
+    success: false,
+    error: authError.message,
+  };
+}
  
     // 2. Otorisasi: Periksa apakah user ID ini ada di tabel 'admins'
     const { data: adminData, error: adminError } = await supabase
@@ -50,16 +71,14 @@ export async function loginAdmin(formData: FormData) {
   }
 }
  
-// Fungsi logoutAdmin di siniexport async function logoutAdmin() {
-  export async function logoutAdmin() {
+export async function logoutAdmin() {
   try {
-  	const supabase = await createClient();
+	const supabase = await createClient();
 	// Memerintahkan Supabase untuk menghapus sesi aktif
 	await supabase.auth.signOut();
 	return { success: true };
   } catch (err) {
-	  console.error("Kesalahan sistem saat logout:", err);
+	console.error("Kesalahan sistem saat logou:", err);
 	return { success: false, error: "Gagal melakukan logout." };
   }
 }
-
